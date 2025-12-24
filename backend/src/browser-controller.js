@@ -1,8 +1,13 @@
 import pkg from 'selenium-webdriver';
 const { Builder, By, until } = pkg;
-import { Options as ChromeOptions } from 'selenium-webdriver/chrome.js';
+import chrome from 'selenium-webdriver/chrome.js';
 import { Options as FirefoxOptions } from 'selenium-webdriver/firefox.js';
 import { Options as EdgeOptions } from 'selenium-webdriver/edge.js';
+
+const { Options: ChromeOptions, ServiceBuilder: ChromeServiceBuilder } = chrome;
+
+// Local ChromeDriver binary path for MCP Selenium agent on this machine
+const LOCAL_CHROMEDRIVER_PATH = 'C\\hyprtask\\lib\\Chromium\\chromedriver.exe';
 
 class BrowserController {
   constructor() {
@@ -20,7 +25,15 @@ class BrowserController {
           const chromeOptions = new ChromeOptions();
           if (headless) chromeOptions.addArguments('--headless=new');
           chromeOptions.addArguments('--no-sandbox', '--disable-dev-shm-usage');
-          driver = await builder.forBrowser('chrome').setChromeOptions(chromeOptions).build();
+
+          // Always use the local ChromeDriver binary so the MCP agent talks to the correct browser
+          const chromeService = new ChromeServiceBuilder(LOCAL_CHROMEDRIVER_PATH);
+
+          driver = await builder
+            .forBrowser('chrome')
+            .setChromeOptions(chromeOptions)
+            .setChromeService(chromeService)
+            .build();
           break;
         }
         case 'firefox': {
