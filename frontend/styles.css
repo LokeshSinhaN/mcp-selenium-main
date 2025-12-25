@@ -59,6 +59,38 @@ body {
   color: var(--text-muted);
 }
 
+.app-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #fbbf24; /* connecting */
+  box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.15);
+}
+
+.status-dot.connected {
+  background: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
+}
+
+.status-dot.disconnected,
+.status-dot.error {
+  background: #ef4444;
+  box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.22);
+}
+
+.ws-status-text {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .app-header-actions {
   display: flex;
   gap: 8px;

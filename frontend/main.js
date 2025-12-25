@@ -8,6 +8,8 @@ const screenshotImgEl = document.getElementById('browser-screenshot');
 const placeholderEl = document.getElementById('browser-placeholder');
 const takeScreenshotBtn = document.getElementById('take-screenshot-btn');
 const closeSessionBtn = document.getElementById('close-session-btn');
+const wsStatusDot = document.getElementById('ws-status-dot');
+const wsStatusText = document.getElementById('ws-status-text');
 
 function formatTimestamp(iso) {
   try {
@@ -37,7 +39,17 @@ function appendLogEntry({ timestamp, type = 'info', message }) {
   chatLogEl.scrollTop = chatLogEl.scrollHeight;
 }
 
+function setWsStatus(stateClass, label) {
+  if (!wsStatusDot || !wsStatusText) return;
+  wsStatusDot.classList.remove('connected', 'disconnected', 'error');
+  if (stateClass) {
+    wsStatusDot.classList.add(stateClass);
+  }
+  wsStatusText.textContent = label;
+}
+
 function connectWebSocket() {
+  setWsStatus('', 'Connecting...');
   const ws = new WebSocket(WS_URL);
 
   ws.addEventListener('message', (event) => {
@@ -50,6 +62,7 @@ function connectWebSocket() {
   });
 
   ws.addEventListener('open', () => {
+    setWsStatus('connected', 'Connected');
     appendLogEntry({
       timestamp: new Date().toISOString(),
       type: 'info',
@@ -58,11 +71,16 @@ function connectWebSocket() {
   });
 
   ws.addEventListener('close', () => {
+    setWsStatus('disconnected', 'Disconnected');
     appendLogEntry({
       timestamp: new Date().toISOString(),
       type: 'error',
       message: 'Execution stream disconnected. Refresh the page to reconnect.',
     });
+  });
+
+  ws.addEventListener('error', () => {
+    setWsStatus('error', 'Error');
   });
 }
 

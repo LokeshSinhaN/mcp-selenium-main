@@ -10,9 +10,9 @@
     <div id="app-root" class="app-shell">
       <header class="app-header">
         <div class="app-logo">MCP Agent</div>
-        <div class="app-header-actions">
-          <span class="pill pill-muted">DOM captured successfully</span>
-          <span class="pill pill-primary">Generating final automation scripts…</span>
+        <div class="app-header-meta">
+          <span class="status-dot" id="ws-status-dot"></span>
+          <span class="ws-status-text" id="ws-status-text">Connecting...</span>
         </div>
       </header>
 
@@ -21,24 +21,9 @@
         <section class="panel panel-chat">
           <div class="panel-inner">
             <div class="section-header">
-              <span class="section-icon">💬</span>
-              <div>
-                <div class="section-title">Selector Overview</div>
-                <div class="section-subtitle">
-                  The automation primarily uses <strong>ID selectors</strong> for input fields, dropdowns, and
-                  buttons (e.g. <code>bmi_height_ftct</code>, <code>waist_sze</code>, <code>bw_calculate_btn</code>).
-                  It also employs <strong>XPath selectors</strong> like
-                  <code>//h2[contains(text(), 'BMI Calculator')]</code> to locate section headers, ensuring
-                  accurate scrolling and interaction within specific page areas.
-                </div>
-              </div>
-            </div>
-
-            <div class="prompt-card">
-              <div class="prompt-label">Task prompt</div>
-              <div class="prompt-body">
-                Generate a Python automation script based on the uploaded SOP: Mayo Clinic Sop with target
-                URLs.pdf
+              <div class="section-title">Agent console</div>
+              <div class="section-subtitle">
+                Chat with the MCP agent and inspect structured execution logs.
               </div>
             </div>
 
