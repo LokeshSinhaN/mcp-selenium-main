@@ -34,10 +34,11 @@ body {
   font-family: var(--font-sans);
   background: radial-gradient(circle at top left, #0f172a 0, #020617 48%, #000 100%);
   color: var(--text-primary);
+  overflow: hidden; /* keep main frame fixed; scroll only within panels */
 }
 
 .app-shell {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   padding: 20px 28px;
@@ -123,6 +124,7 @@ body {
   background: radial-gradient(circle at top left, #0b1220 0, #020617 60%, #000 100%);
   padding: 18px;
   box-shadow: var(--shadow-soft);
+  overflow: hidden; /* prevent main container from growing with chat */
 }
 
 .panel {
@@ -149,6 +151,11 @@ body {
   padding: 18px 18px 16px;
   display: flex;
   flex-direction: column;
+}
+
+/* Chat side should scroll internally without pushing layout */
+.panel-chat .panel-inner {
+  overflow: hidden;
 }
 
 .panel-chat {
@@ -232,6 +239,9 @@ body {
   padding-right: 6px;
   overflow-y: auto;
   scrollbar-width: thin;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .chat-log::-webkit-scrollbar {
@@ -245,11 +255,25 @@ body {
 
 .chat-entry {
   font-size: 12px;
-  padding: 6px 8px;
-  border-radius: 10px;
-  margin-bottom: 6px;
+  padding: 8px 10px;
+  border-radius: 14px;
   border: 1px solid rgba(30, 64, 175, 0.4);
   background: rgba(15, 23, 42, 0.9);
+  max-width: 92%;
+}
+
+/* System / tool messages align to the left edge */
+.chat-entry.system {
+  align-self: flex-start;
+  border-radius: 14px 14px 14px 4px;
+}
+
+/* User prompts align to the right edge with a stronger bubble color */
+.chat-entry.user {
+  align-self: flex-end;
+  border-radius: 14px 14px 4px 14px;
+  border-color: rgba(56, 189, 248, 0.8);
+  background: radial-gradient(circle at 20% 0, #22c1ee, #0ea5e9 50%, #1d4ed8 100%);
 }
 
 .chat-entry span.timestamp {

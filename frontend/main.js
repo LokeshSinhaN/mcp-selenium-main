@@ -20,10 +20,10 @@ function formatTimestamp(iso) {
   }
 }
 
-function appendLogEntry({ timestamp, type = 'info', message }) {
+function appendLogEntry({ timestamp, type = 'info', message, role = 'system' }) {
   if (!message) return;
   const entry = document.createElement('div');
-  entry.className = `chat-entry ${type}`;
+  entry.className = `chat-entry ${type} ${role}`;
 
   const tsSpan = document.createElement('span');
   tsSpan.className = 'timestamp';
@@ -55,7 +55,7 @@ function connectWebSocket() {
   ws.addEventListener('message', (event) => {
     try {
       const payload = JSON.parse(event.data);
-      appendLogEntry(payload);
+      appendLogEntry({ ...payload, role: 'system' });
     } catch (e) {
       console.error('Failed to parse WebSocket message', e);
     }
@@ -66,6 +66,7 @@ function connectWebSocket() {
     appendLogEntry({
       timestamp: new Date().toISOString(),
       type: 'info',
+      role: 'system',
       message: 'Connected to execution stream.',
     });
   });
@@ -75,6 +76,7 @@ function connectWebSocket() {
     appendLogEntry({
       timestamp: new Date().toISOString(),
       type: 'error',
+      role: 'system',
       message: 'Execution stream disconnected. Refresh the page to reconnect.',
     });
   });
@@ -93,6 +95,7 @@ async function sendPrompt(prompt) {
     appendLogEntry({
       timestamp: new Date().toISOString(),
       type: 'error',
+      role: 'system',
       message: `Failed to send prompt: ${e.message}`,
     });
   });
@@ -112,6 +115,7 @@ async function refreshScreenshot() {
     appendLogEntry({
       timestamp: new Date().toISOString(),
       type: 'error',
+      role: 'system',
       message: `Failed to fetch screenshot: ${e.message}`,
     });
   }
@@ -123,6 +127,7 @@ async function closeSession() {
     appendLogEntry({
       timestamp: new Date().toISOString(),
       type: 'success',
+      role: 'system',
       message: 'Browser session closed.',
     });
   } catch (e) {
@@ -142,6 +147,7 @@ chatFormEl.addEventListener('submit', (event) => {
   appendLogEntry({
     timestamp: new Date().toISOString(),
     type: 'info',
+    role: 'user',
     message: value,
   });
 
