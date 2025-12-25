@@ -7,7 +7,8 @@ import { Options as EdgeOptions } from 'selenium-webdriver/edge.js';
 const { Options: ChromeOptions, ServiceBuilder: ChromeServiceBuilder } = chrome;
 
 // Local ChromeDriver binary path for MCP Selenium agent on this machine
-const LOCAL_CHROMEDRIVER_PATH = 'C\\hyprtask\\lib\\Chromium\\chromedriver.exe';
+// NOTE: Use a Windows path with escaped backslashes inside the JS string literal.
+const LOCAL_CHROMEDRIVER_PATH = 'C:\\hyprtask\\lib\\Chromium\\chromedriver.exe';
 
 class BrowserController {
   constructor() {
@@ -62,14 +63,26 @@ class BrowserController {
     }
   }
 
-  getDriver() {
-    const driver = this.drivers.get(this.currentSession);
-    if (!driver) throw new Error('No active browser session. Start a browser first.');
+  async getOrStartDriver() {
+    // Reuse current driver if we already have a session
+    let driver = this.drivers.get(this.currentSession);
+    if (driver) return driver;
+
+    // Lazily start a default Chrome session if none exists yet
+    const { status, error } = await this.startBrowser('chrome', false).catch((e) => ({ status: 'error', error: e.message }));
+    if (status === 'error') {
+      throw new Error(error ?? 'Failed to start browser session.');
+    }
+
+    driver = this.drivers.get(this.currentSession);
+    if (!driver) {
+      throw new Error('Failed to start browser session.');
+    }
     return driver;
   }
 
   async navigate(url) {
-    const driver = this.getDriver();
+    const driver = await this.getOrStartDriver();
     await driver.get(url);
     return { status: 'success', message: `Navigated to ${url}` };
   }
@@ -87,7 +100,7 @@ class BrowserController {
   }
 
   async click(by, value, timeout = 10000) {
-    const driver = this.getDriver();
+    const driver = await this.getOrStartDriver();
     const locator = this.getLocator(by, value);
     const element = await driver.wait(until.elementLocated(locator), timeout);
     await driver.executeScript('arguments[0].scrollIntoView(true);', element);
@@ -96,7 +109,7 @@ class BrowserController {
   }
 
   async sendKeys(by, value, text, timeout = 10000) {
-    const driver = this.getDriver();
+    const driver = await this.getOrStartDriver();
     const locator = this.getLocator(by, value);
     const element = await driver.wait(until.elementLocated(locator), timeout);
     await element.clear();
@@ -105,7 +118,7 @@ class BrowserController {
   }
 
   async getElementText(by, value, timeout = 10000) {
-    const driver = this.getDriver();
+    const driver = await this.getOrStartDriver();
     const locator = this.getLocator(by, value);
     const element = await driver.wait(until.elementLocated(locator), timeout);
     const text = await element.getText();
@@ -113,7 +126,7 @@ class BrowserController {
   }
 
   async takeScreenshot() {
-    const driver = this.getDriver();
+    const driver = await this.getOrStartDriver();
     const screenshot = await driver.takeScreenshot();
     return { status: 'success', screenshot: `data:image/png;base64,${screenshot}` };
   }

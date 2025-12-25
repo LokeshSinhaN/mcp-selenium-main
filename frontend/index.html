@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MCP Agent – Automation Console</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app-root" class="app-shell">
+      <header class="app-header">
+        <div class="app-logo">MCP Agent</div>
+        <div class="app-header-actions">
+          <span class="pill pill-muted">DOM captured successfully</span>
+          <span class="pill pill-primary">Generating final automation scripts…</span>
+        </div>
+      </header>
+
+      <main class="app-main">
+        <!-- Left: Chat / instruction panel (40%) -->
+        <section class="panel panel-chat">
+          <div class="panel-inner">
+            <div class="section-header">
+              <span class="section-icon">💬</span>
+              <div>
+                <div class="section-title">Selector Overview</div>
+                <div class="section-subtitle">
+                  The automation primarily uses <strong>ID selectors</strong> for input fields, dropdowns, and
+                  buttons (e.g. <code>bmi_height_ftct</code>, <code>waist_sze</code>, <code>bw_calculate_btn</code>).
+                  It also employs <strong>XPath selectors</strong> like
+                  <code>//h2[contains(text(), 'BMI Calculator')]</code> to locate section headers, ensuring
+                  accurate scrolling and interaction within specific page areas.
+                </div>
+              </div>
+            </div>
+
+            <div class="prompt-card">
+              <div class="prompt-label">Task prompt</div>
+              <div class="prompt-body">
+                Generate a Python automation script based on the uploaded SOP: Mayo Clinic Sop with target
+                URLs.pdf
+              </div>
+            </div>
+
+            <div id="chat-log" class="chat-log" aria-live="polite"></div>
+
+            <form id="chat-form" class="chat-input" autocomplete="off">
+              <div class="chat-input-wrapper">
+                <textarea
+                  id="prompt-input"
+                  class="chat-textarea"
+                  rows="3"
+                  placeholder="Describe the automation you want to generate…"
+                ></textarea>
+                <button type="submit" class="chat-send-btn" aria-label="Send prompt">
+                  <span class="chat-send-icon">➤</span>
+                </button>
+              </div>
+              <div class="chat-hint">Press Enter to send, Shift+Enter for a new line.</div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Right: Browser preview (60%) -->
+        <section class="panel panel-preview">
+          <div class="panel-inner browser-shell">
+            <div class="browser-toolbar">
+              <div class="browser-controls">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-amber"></span>
+                <span class="dot dot-green"></span>
+              </div>
+              <div class="browser-url-bar">
+                <span class="browser-lock">🔒</span>
+                <input
+                  id="url-display"
+                  class="browser-url-input"
+                  type="text"
+                  readonly
+                  value="https://www.example.com"
+                />
+              </div>
+              <div class="browser-actions">
+                <button type="button" id="take-screenshot-btn" class="toolbar-btn">Capture</button>
+                <button type="button" id="close-session-btn" class="toolbar-btn toolbar-btn-danger">
+                  End session
+                </button>
+              </div>
+            </div>
+
+            <div class="browser-content">
+              <div class="browser-placeholder" id="browser-placeholder">
+                <p class="placeholder-title">No Medi Latte</p>
+                <p class="placeholder-text">
+                  Start by sending a prompt on the left. As Gemini executes steps in the browser, live screenshots
+                  will appear here.
+                </p>
+              </div>
+              <img id="browser-screenshot" class="browser-screenshot" alt="Browser preview" hidden />
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

@@ -4,14 +4,24 @@ import { WebSocketServer } from 'ws';
 import { createServer } from 'http';
 import GeminiExecutor from './gemini-executor.js';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const server = createServer(app); // Attach Express to HTTP server
 const wss = new WebSocketServer({ server }); // Attach WS to HTTP server
 
 app.use(cors());
 app.use(express.json());
+
+// Serve static frontend (40% chat / 60% browser preview UI)
+const frontendDir = path.resolve(__dirname, '../../frontend');
+app.use(express.static(frontendDir));
 
 const executor = new GeminiExecutor(process.env.GEMINI_API_KEY);
 
