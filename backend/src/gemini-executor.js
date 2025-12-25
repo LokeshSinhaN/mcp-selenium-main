@@ -9,12 +9,69 @@ class GeminiExecutor {
   }
 
   getAvailableTools() {
+    // Gemini function calling expects OpenAPI-style "parameters" schemas,
+    // not "input_schema". These schemas are JSON Schema / OpenAPI subsets.
     return [
-      { name: 'start_browser', description: 'Start browser', input_schema: { type: 'object', properties: { browserType: { type: 'string', enum: ['chrome', 'firefox', 'edge'] }, headless: { type: 'boolean' } }, required: ['browserType'] } },
-      { name: 'navigate', description: 'Navigate to URL', input_schema: { type: 'object', properties: { url: { type: 'string' } }, required: ['url'] } },
-      { name: 'click', description: 'Click element', input_schema: { type: 'object', properties: { by: { type: 'string', enum: ['id', 'css', 'xpath'] }, value: { type: 'string' } }, required: ['by', 'value'] } },
-      { name: 'send_keys', description: 'Type text', input_schema: { type: 'object', properties: { by: { type: 'string' }, value: { type: 'string' }, text: { type: 'string' } }, required: ['by', 'value', 'text'] } },
-      { name: 'get_element_text', description: 'Get text', input_schema: { type: 'object', properties: { by: { type: 'string' }, value: { type: 'string' } }, required: ['by', 'value'] } },
+      {
+        name: 'start_browser',
+        description: 'Start browser',
+        parameters: {
+          type: 'object',
+          properties: {
+            browserType: { type: 'string', enum: ['chrome', 'firefox', 'edge'] },
+            headless: { type: 'boolean' }
+          },
+          required: ['browserType']
+        }
+      },
+      {
+        name: 'navigate',
+        description: 'Navigate to URL',
+        parameters: {
+          type: 'object',
+          properties: {
+            url: { type: 'string' }
+          },
+          required: ['url']
+        }
+      },
+      {
+        name: 'click',
+        description: 'Click element',
+        parameters: {
+          type: 'object',
+          properties: {
+            by: { type: 'string', enum: ['id', 'css', 'xpath'] },
+            value: { type: 'string' }
+          },
+          required: ['by', 'value']
+        }
+      },
+      {
+        name: 'send_keys',
+        description: 'Type text',
+        parameters: {
+          type: 'object',
+          properties: {
+            by: { type: 'string' },
+            value: { type: 'string' },
+            text: { type: 'string' }
+          },
+          required: ['by', 'value', 'text']
+        }
+      },
+      {
+        name: 'get_element_text',
+        description: 'Get text',
+        parameters: {
+          type: 'object',
+          properties: {
+            by: { type: 'string' },
+            value: { type: 'string' }
+          },
+          required: ['by', 'value']
+        }
+      },
       { name: 'take_screenshot', description: 'Take screenshot' },
       { name: 'close_session', description: 'Close browser' }
     ];
@@ -44,7 +101,13 @@ class GeminiExecutor {
       const model = this.client.getGenerativeModel({ model: this.model });
       const systemPrompt = "You are a web automation agent. Always start by checking if a browser is open or starting one. Take screenshots after significant actions. Use CSS selectors preferred.";
       
-      const messages = [{ role: 'user', content: userPrompt }];
+      // Gemini expects Content objects with `parts`, not a custom `content` field.
+      const messages = [
+        {
+          role: 'user',
+          parts: [{ text: userPrompt }]
+        }
+      ];
       let iterations = 0;
       
       while (iterations++ < 15) {
